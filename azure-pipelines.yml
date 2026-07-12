@@ -39,6 +39,7 @@ stages:
         dockerfile: '**/Dockerfile'
         tags: ${{ parameters.tag }}
         arguments: '--build-arg VERSION=$(appVersion)'
+        containerRegistry: 'registryConnection'
 
     - task: Docker@2 # <------------------------------ push task
       displayName: 'Push Docker Image'
