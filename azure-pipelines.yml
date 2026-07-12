@@ -13,7 +13,7 @@ resources:
 variables: # <---------------------- AGREGA LAS VARIABLES
   - group: CICD
   - name: appVersion
-  - value: $[variables.appVersion]
+    value: $[variables.appVersion]
 
 
 parameters:
