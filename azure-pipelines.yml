@@ -11,8 +11,6 @@ resources:
 
 variables:
   - group: CICD
-  - name: appVersion
-    value: $[variables.appVersion]
 
 parameters:
   - name: tag
@@ -30,25 +28,25 @@ stages:
 
     steps:
       - script: |
-          echo 'var=$(appVersion)'
+          echo "La version de Azure es: $(Build.BuildId)"
         displayName: Comprobar la variable
 
       - task: Docker@2
         displayName: Build an image
         inputs:
+          containerRegistry: 'registryConnection'
           repository: ${{ parameters.imageName }}
           command: build
           dockerfile: '**/Dockerfile'
           tags: ${{ parameters.tag }}
-          arguments: '--build-arg VERSION=$(appVersion)'
-          containerRegistry: 'registryConnection'
+          arguments: '--build-arg VERSION=$(Build.BuildId)'
 
       - task: Docker@2
         displayName: Push to ACR
         inputs:
-          command: push
           containerRegistry: 'registryConnection' 
           repository: ${{ parameters.imageName }}
+          command: push
           tags: ${{ parameters.tag }}
 
   - job: Deploy
