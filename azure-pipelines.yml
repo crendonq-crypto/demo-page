@@ -60,5 +60,6 @@ stages:
           imageToDeploy: ACRAPPSCAROLINA.azurecr.io/${{ parameters.imageName }}:${{ parameters.tag }}
           containerAppName: app-demo-page
           resourceGroup: RG-jenkinsCaro
+          acrTarget: ACRAPPSCAROLINA.azurecr.io
           acrUsername: $(acrUsername)
           acrPassword: $(acrPassword)
