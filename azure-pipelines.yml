@@ -57,8 +57,8 @@ stages:
       - task: AzureContainerApps@1
         inputs:
           azureSubscription: 'appDeployConnection'
-          imageToBuild: ACRAPPSCAROLINA.azurecr.io/${{ parameters.imageName }}:${{ parameters.tag }}
-          containerAppName: app-demo-page
+          imageToDeploy: ACRAPPSCAROLINA.azurecr.io/${{ parameters.imageName }}:${{ parameters.tag }}
+          containerAppName: "app-demo-page"
           resourceGroup: RG-jenkinsCaro
           acrUsername: $(acrUsername)
           acrPassword: $(acrPassword)
