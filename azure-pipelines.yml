@@ -9,12 +9,10 @@ trigger:
 resources:
 - repo: self
 
-
-variables: # <---------------------- AGREGA LAS VARIABLES
+variables:
   - group: CICD
   - name: appVersion
     value: $[variables.appVersion]
-
 
 parameters:
   - name: tag
@@ -30,28 +28,28 @@ stages:
     displayName: Build
     pool: local-agent
 
-
-
     steps:
-       - script: | # <---------------------- COMPROBAR LA VARIABLE
-              echo 'var=$(appVersion)'
-       - task: Docker@2
-         displayName: Build an image
-         inputs:
-         repository:  ${{ parameters.imageName }}
-         command: build
-         dockerfile: '**/Dockerfile'
-         tags: ${{ parameters.tag }}
-         arguments: '--build-arg VERSION=$(appVersion)'
-         containerRegistry: 'registryConnection'
+      - script: |
+          echo 'var=$(appVersion)'
+        displayName: Comprobar la variable
 
-      -  task: Docker@2
-         displayName: Push to ACR
-         inputs:
-         command: push
-         containerRegistry: 'registryConnection' 
-         repository: ${{ parameters.imageName }}
-         tags: ${{ parameters.tag }}
+      - task: Docker@2
+        displayName: Build an image
+        inputs:
+          repository: ${{ parameters.imageName }}
+          command: build
+          dockerfile: '**/Dockerfile'
+          tags: ${{ parameters.tag }}
+          arguments: '--build-arg VERSION=$(appVersion)'
+          containerRegistry: 'registryConnection'
+
+      - task: Docker@2
+        displayName: Push to ACR
+        inputs:
+          command: push
+          containerRegistry: 'registryConnection' 
+          repository: ${{ parameters.imageName }}
+          tags: ${{ parameters.tag }}
 
   - job: Deploy
     displayName: Deploy
@@ -59,12 +57,10 @@ stages:
     pool: local-agent
     steps:
       - task: AzureContainerApps@1
-
         inputs:
           azureSubscription: 'appDeployConnection'
           imageToBuild: ACRAPPSCAROLINA.azurecr.io/${{ parameters.imageName }}:${{ parameters.tag }}
-          containerAppName: app-demo-page # NOMBRE DEL CONTAINER APP
+          containerAppName: app-demo-page
           resourceGroup: RG-jenkinsCaro
-
           acrUsername: $(acrUsername)
           acrPassword: $(acrPassword)
