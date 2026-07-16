@@ -1,7 +1,7 @@
 # Starter pipeline
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Addd steps that build, run tests, deploy, and more:
-#test
+#test2
 # https://aka.ms/yaml
 
 trigger:
