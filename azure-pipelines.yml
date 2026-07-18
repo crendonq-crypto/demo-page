@@ -36,7 +36,7 @@ stages:
           command: 'build'
           dockerfile: '**/Dockerfile'
           tags: ${{ parameters.tag }}
-          arguments: '--build-arg VERSION=$(appVersion)' # Le pasa la versión a tu Dockerfile
+          arguments: '--build-arg VERSION=${{parameters.tag}}' # Le pasa la versión a tu Dockerfile
 
       # === PASO 2: SUBIR LA IMAGEN AL ACR (¡El que faltaba!) ===
       - task: Docker@2
