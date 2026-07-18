@@ -1,16 +1,11 @@
-# Starter pipeline1233332222
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- main
+https://dev.azure.com/Temp-Jenkins-Abril02/demo-page/_build/results?buildId=33&view=logs&j=da1ed274-4b5c-5884-cc15-36a07ccf3f7b&t=cdffbf6b-51b6-5b9d-f490-d66a9cd0e596&l=57ºtrigger:
+  - main
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
-- group: CICD
+- group: CICD  # Aquí dentro viven tus secretos: acrUsername, acrPassword y appVersion
 
 parameters:
   - name: tag
@@ -20,34 +15,45 @@ parameters:
 
 stages:
 - stage: CICD
-  displayName: CICD workflow
+  displayName: "Flujo Completo CI/CD"
   jobs:
-  - job: Build
-    displayName: Build
+  - job: BuildAndDeploy
+    displayName: "Build, Push & Deploy"
     pool: local-agent
-
     steps:
       - script: |
           echo "La version configurada es: $(appVersion)"
-        displayName: Comprobar la variable
+          echo "Construyendo el tag: ${{ parameters.tag }}"
+        displayName: "Comprobar Variables Iniciales"
 
+      # === PASO 1: CONSTRUIR LA IMAGEN DOCKER ===
       - task: Docker@2
-        displayName: Build an image
+        displayName: "Build Docker Image"
         inputs:
-          containerRegistry: 'registryConnection'
+          containerRegistry: 'registryConnection' # Usa el nombre de tu Service Connection
           repository: ${{ parameters.imageName }}
           command: 'build'
           dockerfile: '**/Dockerfile'
-          tags: |
-            $(tag)
+          tags: ${{ parameters.tag }}
+          arguments: '--build-arg VERSION=$(appVersion)' # Le pasa la versión a tu Dockerfile
 
+      # === PASO 2: SUBIR LA IMAGEN AL ACR (¡El que faltaba!) ===
+      - task: Docker@2
+        displayName: "Push Docker Image to ACR"
+        inputs:
+          containerRegistry: 'registryConnection' # Mismo Service Connection
+          repository: ${{ parameters.imageName }}
+          command: 'push'
+          tags: ${{ parameters.tag }}
+
+      # === PASO 3: DESPLEGAR EN AZURE CONTAINER APPS ===
       - task: AzureContainerApps@1
-        displayName: Deploy to Azure Container App
+        displayName: "Deploy to Azure Container App"
         inputs:
           azureSubscription: 'appDeployConnection'
-          imageToDeploy: '$(acrTarget)/${{ parameters.imageName }}:$(tag)'
+          # Reemplaza ACRAPPSCAROLINA si tu login server real es diferente en minúsculas
+          imageToDeploy: 'acrappscarolina.azurecr.io/${{ parameters.imageName }}:${{ parameters.tag }}'
           containerAppName: 'app-demo-page'
           resourceGroup: 'RG-jenkinsCaro'
-          acrTarget: 'ACRAPPSCAROLINA.azurecr.io'
           acrUsername: $(acrUsername)
           acrPassword: $(acrPassword)
