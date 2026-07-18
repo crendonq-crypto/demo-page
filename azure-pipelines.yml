@@ -34,7 +34,7 @@ stages:
       - task: Docker@2
         displayName: Build an image
         inputs:
-          containerRegistry: 'ACRAPPSCAROLINA'
+          containerRegistry: 'registryConnection'
           repository: ${{ parameters.imageName }}
           command: 'build'
           dockerfile: '**/Dockerfile'
